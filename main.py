@@ -1,6 +1,9 @@
 import RE as mac
-re = mac.RE()
+
 rotors,rings,initialRotPos,plugboard,reflector = [],[],[],"",""
+re = mac.RE()
+re.Settings()
+ch,settingsFlag = 0,0
 
 #Select_Settings
 def selectSettings(fullSettings=True):
@@ -21,7 +24,7 @@ def selectSettings(fullSettings=True):
         rings = ['A','A','A','A','A'] if len(inp) != 5 else inp
 
         #Getting Plugboard Setting
-        plugboard = input("Plugboard Pairs - Eg : a^-s-Cd-s-e1-s-**-s-45 : ").replace('-s-','-S-')
+        plugboard = input("Plugboard Pairs - Eg : a^-s-Cd-s-e1-s-*/-s-45 : ").replace('-s-','-S-')
         
         #initialSetting
         inp = input("Rotor initial setting (Eg : Q-S-#-S-R-S-@-S-1) : ").replace('-s-','-S-').split("-S-")
@@ -48,5 +51,31 @@ def displaySettings():
 def displayRotorSettings():
     R1,R2,R3,R4,R5 = re.getCurrentRotorPos()
     print('\t',R1,R2,R3,R4,R5)
-    
-selectSettings(True)
+
+while ch != 5:
+    try:
+        print("\n\tMENU\n1.Settings\n2.Initial Setting\n3.Display Settings\n4.Type\n5.Exit")
+        ch = input("Enter your choice : ")
+        if ch == '1':
+            selectSettings()
+            settingsFlag=1
+        elif ch == '2':
+            selectSettings(False)
+        elif ch == '3':
+            displaySettings()
+        elif ch == '4':
+            if settingsFlag != 0:
+                print()
+                displayRotorSettings()
+                print()
+                message = input("Enter a message   : ")
+                print("Encrypted Message :",re.typeMessage(message))
+            else:
+                selectSettings()
+                f = 1
+        elif ch == '5':
+            break
+        else:
+            print('\n\t"Invalid choice"')
+    except:
+        print("\n\tInput values correctly !")
