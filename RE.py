@@ -8,7 +8,7 @@ class RE:
         self.plugBoard,self.reflector = "",""
         self.rotors,self.rings,self.initalPos,self.rotorsInitialInfo = [],[],[],[]
     
-    def Settings(self,rotI="I",rotII="II",rotIII="III",rotIV="IV",rotV="V",rinI="A",rinII="A",rinIII="A",rinIV="A",rinV="A",iniPosI="A",iniPosII="A",iniPosIII="A",iniPosIV="A",iniPosV="A",refl="A",plugboard=""):
+    def Settings(self,rotI="I",rotII="II",rotIII="III",rotIV="IV",rotV="V",rinI="A",rinII="A",rinIII="A",rinIV="A",rinV="A",iniPosI="A",iniPosII="A",iniPosIII="A",iniPosIV="A",iniPosV="A",plugboard="",refl="A"):
        
         #set the given initial_settings
         self.rotorsInitialInfo = [self.rotInfo[rotI],self.rotInfo[rotII],self.rotInfo[rotIII],self.rotInfo[rotIV],self.rotInfo[rotV]]
@@ -51,7 +51,52 @@ class RE:
     def getDetails(self):
         details = (self.getKeys(self.rotInfo,self.rotorsInitialInfo[0]),self.getKeys(self.rotInfo,self.rotorsInitialInfo[1]),self.getKeys(self.rotInfo,self.rotorsInitialInfo[2]),self.getKeys(self.rotInfo,self.rotorsInitialInfo[3]),self.getKeys(self.rotInfo,self.rotorsInitialInfo[4]),self.rings[0],self.rings[1],self.rings[2],self.rings[3],self.rings[4],self.initalPos[0],self.initalPos[1],self.initalPos[2],self.initalPos[3],self.initalPos[4],self.plugBoard,self.reflector)
         return details
+    
+    #get_current_rotor_settings
+    def getCurrentRotorPos(self):
+        currentPos = (self.rotors[0][2][0],self.rotors[1][2][0],self.rotors[2][2][0],self.rotors[3][2][0],self.rotors[4][2][0])
+        return currentPos
 
-re = RE()
-re.Settings()
-print(re.getDetails())
+    #run_the_given_letter_through_rotors
+    def run_rotor(self,no,idx):
+        if no == -1 :
+            x = self.rotors[no][idx]
+            return self.ETW.index(x)
+        else: 
+            x = self.rotors[no][1][idx]
+            matchIndex = self.rotors[no][0].index(x)
+            idx = self.run_rotor(no-1,matchIndex)
+            x = self.rotors[no][0][idx]
+            matchIndex = self.rotors[no][1].index(x)
+            return matchIndex
+
+    #rotate
+    def rotate(self,val):
+        k = []
+        for i in range(val,0,-1):
+            if self.rotors[i][2][0] == self.notchInfo[self.getKeys(self.rotInfo,self.rotorsInitialInfo[i])]:
+                k.append(i)
+        for i in range(3):
+            self.rotors[val][i] = self.rotors[val][i][1:] + self.rotors[val][i][:1]
+        if len(k) != 0:
+            if val == max(k):
+                self.rotate(val - 1)
+            else:
+                self.rotate(max(k))
+
+    #type_the_given_message
+    def typeMessage(self,message):
+        encryptedMessage = ''
+        for i in message:
+            self.rotate(4)
+            letterToSend = self.plugBoardDict[i]
+            idxOfRecievedLetter = self.run_rotor(4,self.ETW.index(letterToSend))
+            encryptedLetter = self.plugBoardDict[self.ETW[idxOfRecievedLetter]]
+            encryptedMessage += encryptedLetter
+        return encryptedMessage
+
+if __name__ == "__main__":
+    re = RE()
+    re.Settings('I','II','III','IV','V','A','A','A','A','A','A','A','A','A','A','','A')
+    msg = input("Enter a message : ")
+    print(re.typeMessage(msg))
