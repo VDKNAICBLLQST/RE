@@ -72,7 +72,12 @@ while ch != 5:
                 print("Encrypted Message :",re.typeMessage(message))
             else:
                 selectSettings()
-                f = 1
+                settingsFlag = 1
+                print()
+                displayRotorSettings()
+                print()
+                message = input("Enter a message   : ")
+                print("Encrypted Message :",re.typeMessage(message))
         elif ch == '5':
             break
         else:
